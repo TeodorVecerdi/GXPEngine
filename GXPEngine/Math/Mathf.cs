@@ -53,10 +53,17 @@ namespace GXPEngine {
         }
 
         /// <summary>
-        ///     Returns the acosine of the specified number
+        ///     Returns the arc-cosine of the specified number
         /// </summary>
         public static float Acos(float f) {
             return (float) Math.Acos(f);
+        }
+        
+        /// <summary>
+        ///     Returns the arc-sine of the specified number
+        /// </summary>
+        public static float Asin(float f) {
+            return (float) Math.Asin(f);
         }
 
         /// <summary>
