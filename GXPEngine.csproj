@@ -80,7 +80,6 @@
     <Compile Include="GXPEngine\Utils\MouseHandler.cs" />
     <Compile Include="GXPEngine\Utils\Time.cs" />
     <Compile Include="GXPEngine\Utils\Utils.cs" />
-    <Compile Include="GXPEngine\Utils\ValueTuple.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
