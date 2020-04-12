@@ -9,8 +9,8 @@ namespace GXPEngine {
 	///     The Input class contains functions for reading keys and mouse
 	/// </summary>
 	public class Input {
-		private static Dictionary<string, (List<int>, List<int>)> Axes = new Dictionary<string, (List<int>, List<int>)>();
-		private static Dictionary<string, (int, bool)> Buttons = new Dictionary<string, (int, bool)>();
+		private static readonly Dictionary<string, (List<int>, List<int>)> Axes = new Dictionary<string, (List<int>, List<int>)>();
+		private static readonly Dictionary<string, (int, bool)> Buttons = new Dictionary<string, (int, bool)>();
 		/// <summary>
 		///     Gets the current mouse x position in pixels.
 		/// </summary>
@@ -20,6 +20,11 @@ namespace GXPEngine {
 		///     Gets the current mouse y position in pixels.
 		/// </summary>
 		public static int mouseY => GLContext.mouseY;
+
+		/// <summary>
+		/// 	Gets the current mouse position in pixels as a vector
+		/// </summary>
+		public static Vector2 mousePosition => new Vector2(mouseX, mouseY);
 
 		/// <summary>
 		///     Returns 'true' if given key is down, else returns 'false'
