@@ -20,13 +20,13 @@ namespace GXPEngine {
             return formattable != null ? formattable.ToString(null, CultureInfo.InvariantCulture) : message.ToString();
         }
 
-        public static void Log(object message, string messageTitle = "[LOG]") {
+        public static void Log(object message, string messageTitle = "LOG") {
 #if DEBUG
-            // var fileName = filePath.Substring(filePath.LastIndexOf("\\", StringComparison.Ordinal) + 1);
-            var stack = new StackTrace().GetFrame(1);
+            var stack = new StackFrame(1, true);
             var mth = stack.GetMethod();
+            var fname = stack.GetFileName();
             var lineNumber = stack.GetFileLineNumber();
-            var fileName = stack.GetFileName();
+            var fileName = fname?.Substring(fname.LastIndexOf("\\", StringComparison.InvariantCulture)+1);
             var className = mth.ReflectedType?.Name;
             var method = new StringBuilder();
             method.Append(mth.Name);
@@ -48,12 +48,13 @@ namespace GXPEngine {
 #endif
         }
 
-        public static void LogWarning(object message, string messageTitle = "[WARN]") {
+        public static void LogWarning(object message, string messageTitle = "WARN") {
 #if DEBUG
-            var stack = new StackTrace().GetFrame(1);
+            var stack = new StackFrame(1, true);
             var mth = stack.GetMethod();
+            var fname = stack.GetFileName();
             var lineNumber = stack.GetFileLineNumber();
-            var fileName = stack.GetFileName();
+            var fileName = fname?.Substring(fname.LastIndexOf("\\", StringComparison.InvariantCulture)+1);
             var className = mth.ReflectedType?.Name;
             var method = new StringBuilder();
             method.Append(mth.Name);
@@ -79,10 +80,11 @@ namespace GXPEngine {
 
         public static void LogError(object message, string messageTitle = "ERROR") {
 #if DEBUG
-            var stack = new StackTrace().GetFrame(1);
+            var stack = new StackFrame(1, true);
             var mth = stack.GetMethod();
+            var fname = stack.GetFileName();
             var lineNumber = stack.GetFileLineNumber();
-            var fileName = stack.GetFileName();
+            var fileName = fname?.Substring(fname.LastIndexOf("\\", StringComparison.InvariantCulture)+1);
             var className = mth.ReflectedType?.Name;
             var method = new StringBuilder();
             method.Append(mth.Name);
@@ -109,21 +111,23 @@ namespace GXPEngine {
         public static void Assert(bool condition, object message) {
 #if ASSERT || DEBUG
             if (condition) return;
-            var stack = new StackTrace().GetFrame(1);
+            var stack = new StackFrame(1, true);
+            var fname = stack.GetFileName();
             var lineNumber = stack.GetFileLineNumber();
-            var fileName = stack.GetFileName();
+            var fileName = fname?.Substring(fname.LastIndexOf("\\", StringComparison.InvariantCulture)+1);
             Fail(message, "ASSERTION FAILED", lineNumber, fileName);
 #endif
         }
 
         public static void Fail(object message, string messageTitle = "FAIL", int lineNumber = 0, string filePath = "") {
 #if ASSERT || DEBUG
-            var stack = new StackTrace().GetFrame(1);
+            var stack = new StackFrame(1, true);
             var mth = stack.GetMethod();
+            var fname = stack.GetFileName();
+            var fileName = fname?.Substring(fname.LastIndexOf("\\", StringComparison.InvariantCulture)+1);
+            var className = mth.ReflectedType?.Name;
             if(lineNumber == 0)
                 lineNumber = stack.GetFileLineNumber();
-            var fileName = stack.GetFileName();
-            var className = mth.ReflectedType?.Name;
             var method = new StringBuilder();
             method.Append(mth.Name);
             method.Append("(");
