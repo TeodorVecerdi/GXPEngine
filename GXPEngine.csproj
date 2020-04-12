@@ -83,6 +83,7 @@
     <Compile Include="GXPEngine\Utils\Input.cs" />
     <Compile Include="GXPEngine\Utils\Key.cs" />
     <Compile Include="GXPEngine\Utils\MouseHandler.cs" />
+    <Compile Include="GXPEngine\Utils\Rand.cs" />
     <Compile Include="GXPEngine\Utils\Time.cs" />
     <Compile Include="GXPEngine\Utils\Utils.cs" />
   </ItemGroup>
