@@ -6,11 +6,13 @@ namespace GXPEngine {
     ///     Representation of 2D vectors and points.
     /// </summary>
     public struct Vector2 : IEquatable<Vector2>, IFormattable {
+        // ReSharper disable once InconsistentNaming
         /// <summary>
         ///     X component of the vector
         /// </summary>
         public float x;
 
+        // ReSharper disable once InconsistentNaming
         /// <summary>
         ///     Y component of the vector
         /// </summary>
@@ -21,16 +23,28 @@ namespace GXPEngine {
             this.y = y;
         }
 
+        /// <summary>
+        ///     Sets the x and y components of this vector
+        /// </summary>
+        /// <param name="x">The new x component</param>
+        /// <param name="y">The new y component</param>
         public void Set(float x, float y) {
             this.x = x;
             this.y = y;
         }
 
+        /// <summary>
+        ///     Scales the current vector by the vector <paramref name="scale" />
+        /// </summary>
+        /// <param name="scale"></param>
         public void Scale(Vector2 scale) {
             x *= scale.x;
             y *= scale.y;
         }
 
+        /// <summary>
+        ///     Normalizes the current vector
+        /// </summary>
         public void Normalize() {
             var mag = magnitude;
             if (mag > float.Epsilon)
@@ -39,6 +53,9 @@ namespace GXPEngine {
                 this = zero;
         }
 
+        /// <summary>
+        ///     Gets the normalized vector
+        /// </summary>
         public Vector2 normalized {
             get {
                 var v = new Vector2(x, y);
@@ -46,14 +63,101 @@ namespace GXPEngine {
                 return v;
             }
         }
+        
+        /// <summary>
+        ///     Returns the length of this vector
+        /// </summary>
+        public float magnitude => Mathf.Sqrt(x * x + y * y);
 
-        public override bool Equals(object other) {
-            if (!(other is Vector2)) return false;
-            return Equals((Vector2) other);
+        /// <summary>
+        ///     Returns the squared length of this vector
+        /// </summary>
+        public float sqrMagnitude => x * x + y * y;
+
+        /// <summary>
+        ///     Sets the angle of the current vector
+        /// </summary>
+        /// <param name="degrees">Degrees</param>
+        public void SetAngleDegrees(float degrees) {
+            SetAngleRadians(Mathf.Deg2Rad * degrees);
+        }
+
+        /// <summary>
+        ///     Sets the angle of the current vector
+        /// </summary>
+        /// <param name="radians">Radians</param>
+        public void SetAngleRadians(float radians) {
+            var m = magnitude;
+            var unit = GetUnitVectorRad(radians);
+            Set(unit.x * m, unit.y * m);
+        }
+
+        /// <summary>
+        ///     Returns the angle of the current vector in degrees
+        /// </summary>
+        /// <returns>The angle of the current vector in degrees</returns>
+        public float GetAngleDegrees() {
+            return Mathf.Deg2Rad * GetAngleRadians();
+        }
+
+        /// <summary>
+        ///     Returns the angle of the current vector in radians
+        /// </summary>
+        /// <returns>The angle of the current vector in radians</returns>
+        public float GetAngleRadians() {
+            var n = normalized;
+            var angle = Mathf.Atan2(n.y, n.x);
+            return angle;
+        }
+
+        /// <summary>
+        ///     Rotates the current vector by <paramref name="degrees" /> degrees.
+        /// </summary>
+        /// <param name="degrees">Degrees</param>
+        public void RotateDegrees(float degrees) {
+            RotateRadians(Mathf.Deg2Rad * degrees);
+        }
+
+        /// <summary>
+        ///     Rotates the current vector by <paramref name="radians" /> radians.
+        /// </summary>
+        /// <param name="radians">Radians</param>
+        public void RotateRadians(float radians) {
+            var c = Mathf.Cos(radians);
+            var s = Mathf.Sin(radians);
+            var newX = x * c - y * s;
+            var newY = x * s + y * c;
+            Set(newX, newY);
+        }
+
+        /// <summary>
+        ///     Rotates this Vec2 around <paramref name="point" /> by <paramref name="degrees" />
+        /// </summary>
+        /// <param name="point">The point around which to rotate</param>
+        /// <param name="degrees">The amount of degrees to rotate by</param>
+        public void RotateAroundDegrees(Vector2 point, float degrees) {
+            RotateAroundRadians(point, degrees * Mathf.Deg2Rad);
+        }
+
+        /// <summary>
+        ///     Rotates this Vec2 around <paramref name="point" /> by <paramref name="radians" />
+        /// </summary>
+        /// <param name="point">The point around which to rotate</param>
+        /// <param name="radians">The amount of radians to rotate by</param>
+        public void RotateAroundRadians(Vector2 point, float radians) {
+            var copy = this;
+            copy -= point;
+            copy.RotateRadians(radians);
+            copy += point;
+            Set(copy.x, copy.y);
+        }
+
+        public override bool Equals(object obj) {
+            return obj is Vector2 other && Equals(other);
         }
 
         public bool Equals(Vector2 other) {
-            return x == other.x && y == other.y;
+            return Math.Abs(x - other.x) < float.Epsilon && Math.Abs(y - other.y) < float.Epsilon;
         }
 
         public override int GetHashCode() {
@@ -72,19 +176,27 @@ namespace GXPEngine {
                 format = "F1";
             return string.Format("({0}, {1})", x.ToString(format, formatProvider), y.ToString(format, formatProvider));
         }
-
+        
         /// <summary>
-        ///     Returns the length of this vector
+        ///     Returns a unit vector rotated by <paramref name="degrees" /> degrees
         /// </summary>
-        public float magnitude => Mathf.Sqrt(x * x + y * y);
+        /// <param name="degrees">Degrees</param>
+        /// <returns>Unit vector rotated by <paramref name="degrees" /> degrees</returns>
+        public static Vector2 GetUnitVectorDeg(float degrees) {
+            return GetUnitVectorRad(Mathf.Deg2Rad * degrees);
+        }
 
         /// <summary>
-        ///     Returns the squared length of this vector
+        ///     Returns a unit vector rotated by <paramref name="radians" /> radians
         /// </summary>
-        public float sqrMagnitude => x * x + y * y;
+        /// <param name="radians">Radians</param>
+        /// <returns>Unit vector rotated by <paramref name="radians" /> radians</returns>
+        public static Vector2 GetUnitVectorRad(float radians) {
+            return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
+        }
 
         /// <summary>
-        /// Returns a <see cref="GXPEngine.Vector2"/> perpendicular on the <paramref name="inDirection"/> parameter
+        ///     Returns a <see cref="GXPEngine.Vector2" /> perpendicular on the <paramref name="inDirection" /> parameter
         /// </summary>
         public static Vector2 Perpendicular(Vector2 inDirection) {
             return new Vector2(-inDirection.y, inDirection.x);
