@@ -95,8 +95,11 @@ namespace GXPEngine {
             return GLContext.GetMouseButtonUp(button); /*courtesy of LeonB*/
         }
 
-		public static void AddAxis(string axisName, List<int> negativeKeys, List<int> positiveKeys) {
-			Axes.Add(axisName, ValueTuple.Create(negativeKeys, positiveKeys));
+		public static void AddAxis(string axisName, List<int> negativeKeys, List<int> positiveKeys, bool flipped = false) {
+			if(flipped)
+				Axes.Add(axisName, ValueTuple.Create(positiveKeys, negativeKeys));
+			else
+				Axes.Add(axisName, ValueTuple.Create(negativeKeys, positiveKeys));
 		}
 
 		public static float GetAxis(string axisName) {

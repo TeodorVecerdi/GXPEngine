@@ -47,6 +47,34 @@ namespace GXPEngine {
             Console.WriteLine(LogFormat.format(className, method, lineNumber, fileName));
 #endif
         }
+        
+        public static void LogInfo(object message, string messageTitle = "INFO") {
+#if DEBUG
+            var stack = new StackFrame(1, true);
+            var mth = stack.GetMethod();
+            var fname = stack.GetFileName();
+            var lineNumber = stack.GetFileLineNumber();
+            var fileName = fname?.Substring(fname.LastIndexOf("\\", StringComparison.InvariantCulture)+1);
+            var className = mth.ReflectedType?.Name;
+            var method = new StringBuilder();
+            method.Append(mth.Name);
+            method.Append("(");
+            var methodParameters = mth.GetParameters();
+            for (var i = 0; i < methodParameters.Length; i++) {
+                method.Append(methodParameters[i].ParameterType);
+                if (i != methodParameters.Length - 1) method.Append(", ");
+            }
+
+            method.Append(")");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Blue;
+            Console.Write("[" + messageTitle + "]");
+            Console.ResetColor();
+            Console.Write(" " + GetString(message));
+            Console.ResetColor();
+            Console.WriteLine(LogFormat.format(className, method, lineNumber, fileName));
+#endif
+        }
 
         public static void LogWarning(object message, string messageTitle = "WARN") {
 #if DEBUG
