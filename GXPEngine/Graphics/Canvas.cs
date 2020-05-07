@@ -90,6 +90,24 @@ namespace GXPEngine {
             graphics.DrawImage(sprite.texture.bitmap, destPoints);
         }
 
+        public void DrawTexture(Texture2D texture, float x, float y) {
+            var halfWidth = texture.width / 2.0f;
+            var halfHeight = texture.height / 2.0f;
+            destPoints[0] = new PointF(x + -halfWidth, y + -halfHeight);
+            destPoints[1] = new PointF(x + halfWidth, y + -halfHeight);
+            destPoints[2] = new PointF(x + -halfWidth, y + halfHeight);
+            graphics.DrawImage(texture.bitmap, destPoints);
+        }
+
+        public void DrawImage(Bitmap bitmap, float x, float y) {
+            var halfWidth = bitmap.Width / 2.0f;
+            var halfHeight = bitmap.Height / 2.0f;
+            destPoints[0] = new PointF(x + -halfWidth, y + -halfHeight);
+            destPoints[1] = new PointF(x + halfWidth, y + -halfHeight);
+            destPoints[2] = new PointF(x + -halfWidth, y + halfHeight);
+            graphics.DrawImage(bitmap, destPoints);
+        }
+
         // Called by the garbage collector
         ~Canvas() {
             _graphics.Dispose();

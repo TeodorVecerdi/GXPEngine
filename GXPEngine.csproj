@@ -79,6 +79,7 @@
     <Compile Include="GXPEngine\Sound.cs" />
     <Compile Include="GXPEngine\SoundChannel.cs" />
     <Compile Include="GXPEngine\Sprite.cs" />
+    <Compile Include="GXPEngine\Utils\Button.cs" />
     <Compile Include="GXPEngine\Utils\Debug.cs" />
     <Compile Include="GXPEngine\Utils\Input.cs" />
     <Compile Include="GXPEngine\Utils\Key.cs" />

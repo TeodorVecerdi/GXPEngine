@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GXPEngine.OpenGL;
 
 namespace GXPEngine.Core {
@@ -21,9 +22,14 @@ namespace GXPEngine.Core {
 
         public static int mouseX;
         public static int mouseY;
+        
+        private static int lastKey;
+        private static int lastKeyDown;
+        private static int lastKeyUp;
 
         private static double _realToLogicWidthRatio;
         private static double _realToLogicHeightRatio;
+        
 
         private readonly Game _owner;
         private int _frameCount;
@@ -84,9 +90,15 @@ namespace GXPEngine.Core {
             GL.glfwSetKeyCallback(
                 (_key, _mode) => {
                     var press = _mode == 1;
-                    if (press) keydown[_key] = true;
-                    else keyup[_key] = true;
+                    if (press) {
+                        keydown[_key] = true;
+                        lastKeyDown = _key;
+                    } else {
+                        keyup[_key] = true;
+                        lastKeyUp = _key;
+                    }
                     keys[_key] = press;
+                    lastKey = _key;
                 });
 
             GL.glfwSetMouseButtonCallback(
@@ -306,6 +318,57 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         public static bool GetKeyUp(int key) {
             return keyup[key];
+        }
+        
+        //------------------------------------------------------------------------------------------------------------------------
+        //														AnyKey()
+        //------------------------------------------------------------------------------------------------------------------------
+        public static bool AnyKey() {
+            for(var i = 0; i < MAXKEYS; i++)
+                if (keys[i])
+                    return true;
+            return false;
+        }
+
+        //------------------------------------------------------------------------------------------------------------------------
+        //														AnyKeyDown()
+        //------------------------------------------------------------------------------------------------------------------------
+        public static bool AnyKeyDown() {
+            for(var i = 0; i < MAXKEYS; i++)
+                if (keydown[i])
+                    return true;
+            return false;
+        }
+
+        //------------------------------------------------------------------------------------------------------------------------
+        //														AnyKeyUp()
+        //------------------------------------------------------------------------------------------------------------------------
+        public static bool AnyKeyUp() {
+            for(var i = 0; i < MAXKEYS; i++)
+                if (keyup[i])
+                    return true;
+            return false;
+        }
+        
+        //------------------------------------------------------------------------------------------------------------------------
+        //														LastKey()
+        //------------------------------------------------------------------------------------------------------------------------
+        public static int LastKey() {
+            return lastKey;
+        }
+
+        //------------------------------------------------------------------------------------------------------------------------
+        //														LastKeyDown()
+        //------------------------------------------------------------------------------------------------------------------------
+        public static int LastKeyDown() {
+            return lastKeyDown;
+        }
+
+        //------------------------------------------------------------------------------------------------------------------------
+        //														LastKeyUp()
+        //------------------------------------------------------------------------------------------------------------------------
+        public static int LastKeyUp() {
+            return lastKeyUp;
         }
 
         //------------------------------------------------------------------------------------------------------------------------

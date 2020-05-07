@@ -55,6 +55,57 @@ namespace GXPEngine {
 		public static bool GetKeyUp(int key) {
             return GLContext.GetKeyUp(key);
         }
+		
+		/// <summary>
+		///     Returns 'true' if any key is down, else returns 'false'
+		/// </summary>
+		public static bool AnyKey() {
+			return GLContext.AnyKey();
+		}
+
+		/// <summary>
+		///     Returns 'true' if any key was pressed down during the current frame
+		/// </summary>
+		public static bool AnyKeyDown() {
+			return GLContext.AnyKeyDown();
+		}
+
+		/// <summary>
+		///     Returns 'true' if any key was released during the current frame
+		/// </summary>
+		public static bool AnyKeyUp() {
+			return GLContext.AnyKeyUp();
+		}
+		
+		/// <summary>
+		///     Returns the last key
+		/// </summary>
+		public static int LastKey => GLContext.LastKey();
+		
+
+		/// <summary>
+		///     Returns the last key down
+		/// </summary>
+		public static int LastKeyDown => GLContext.LastKeyDown();
+		
+
+		/// <summary>
+		///     Returns the last key up
+		/// </summary>
+		public static bool LastKeyUp => GLContext.AnyKeyUp();
+		
+
+		/// <summary>
+		/// 	Returns the string equivalent of the pressed key
+		/// </summary>
+		/// <param name="key">The key</param>
+		/// <returns>The string equivalent of the pressed key</returns>
+		public static string KeyToString(int key) {
+			if (!Key.KEY_TO_STRING.ContainsKey(key) || !Key.KEY_TO_STRING_UPPER.ContainsKey(key)) return "";
+			
+			var upper = GetKey(Key.LEFT_SHIFT) || GetKey(Key.RIGHT_SHIFT);
+			return upper ? Key.KEY_TO_STRING_UPPER[key] : Key.KEY_TO_STRING[key];
+		}
 
 		/// <summary>
 		///     Returns 'true' if mousebutton is down, else returns 'false'
