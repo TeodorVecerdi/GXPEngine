@@ -79,8 +79,8 @@ namespace GXPEngine {
         public const int NUMPAD_7 = 309;
         public const int NUMPAD_8 = 310;
         public const int NUMPAD_9 = 311;
-        public const int MINUS = 314;
-        public const int PLUS = 315;
+        public const int NUMPAD_MINUS = 314;
+        public const int NUMPAD_PLUS = 315;
         public const int LEFT_ALT = 291;
         public const int RIGHT_ALT = 292;
         public const int TAB = 293;
@@ -94,6 +94,9 @@ namespace GXPEngine {
         public const int COMMA = 44;
         public const int DOT = 46;
         public const int QUESTION_MARK = 47;
+        public const int MINUS = 45;
+        public const int EQUALS = 61;
+        public const int BACKSLASH = 92;
         
         public static Dictionary<int, string> KEY_TO_STRING = new Dictionary<int, string> {
 	        {F1, ""},
@@ -170,7 +173,7 @@ namespace GXPEngine {
 	        {NUMPAD_8, "8"},
 	        {NUMPAD_9, "9"},
 	        {MINUS, "-"},
-	        {PLUS, "="},
+	        {EQUALS, "="},
 	        {LEFT_ALT, ""},
 	        {RIGHT_ALT, ""},
 	        {TAB, ""},
@@ -183,7 +186,8 @@ namespace GXPEngine {
 	        {APOSTROPHE, "'"},
 	        {COMMA, ","},
 	        {DOT, "."},
-	        {QUESTION_MARK, "/"}
+	        {QUESTION_MARK, "/"},
+	        {BACKSLASH, "\\"}
         };
         public static Dictionary<int, string> KEY_TO_STRING_UPPER = new Dictionary<int, string> {
 	        {F1, ""},
@@ -260,7 +264,7 @@ namespace GXPEngine {
 	        {NUMPAD_8, "8"},
 	        {NUMPAD_9, "9"},
 	        {MINUS, "_"},
-	        {PLUS, "+"},
+	        {EQUALS, "+"},
 	        {LEFT_ALT, ""},
 	        {RIGHT_ALT, ""},
 	        {TAB, ""},
@@ -273,7 +277,8 @@ namespace GXPEngine {
 	        {APOSTROPHE, "\""},
 	        {COMMA, "<"},
 	        {DOT, ">"},
-	        {QUESTION_MARK, "?"}
+	        {QUESTION_MARK, "?"},
+	        {BACKSLASH, "|"}
         };
 	}
 }
