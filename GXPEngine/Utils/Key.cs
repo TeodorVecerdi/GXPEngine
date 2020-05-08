@@ -66,7 +66,7 @@ namespace GXPEngine {
         public const int ESCAPE = 257;
         public const int SPACE = 32;
         public const int ENTER = 294;
-        public const int DELETE = 127;
+        public const int NUMPAD_DELETE = 127;
         public const int BACKSPACE = 295;
         public const int LEFT_CTRL = 289;
         public const int RIGHT_CTRL = 290;
@@ -97,6 +97,7 @@ namespace GXPEngine {
         public const int MINUS = 45;
         public const int EQUALS = 61;
         public const int BACKSLASH = 92;
+        public const int DELETE = 297;
         
         public static Dictionary<int, string> KEY_TO_STRING = new Dictionary<int, string> {
 	        {F1, ""},
@@ -187,7 +188,10 @@ namespace GXPEngine {
 	        {COMMA, ","},
 	        {DOT, "."},
 	        {QUESTION_MARK, "/"},
-	        {BACKSLASH, "\\"}
+	        {BACKSLASH, "\\"},
+	        {NUMPAD_DELETE, ""},
+	        {NUMPAD_MINUS, ""},
+	        {NUMPAD_PLUS, ""}
         };
         public static Dictionary<int, string> KEY_TO_STRING_UPPER = new Dictionary<int, string> {
 	        {F1, ""},
@@ -278,7 +282,10 @@ namespace GXPEngine {
 	        {COMMA, "<"},
 	        {DOT, ">"},
 	        {QUESTION_MARK, "?"},
-	        {BACKSLASH, "|"}
+	        {BACKSLASH, "|"},
+	        {NUMPAD_DELETE, ""},
+	        {NUMPAD_MINUS, ""},
+	        {NUMPAD_PLUS, ""}
         };
 	}
 }
