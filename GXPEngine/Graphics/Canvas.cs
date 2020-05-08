@@ -90,6 +90,18 @@ namespace GXPEngine {
             graphics.DrawImage(sprite.texture.bitmap, destPoints);
         }
 
+        public void DrawSprite(Sprite sprite, float x, float y) {
+            var halfWidth = sprite.texture.width / 2.0f;
+            var halfHeight = sprite.texture.height / 2.0f;
+            var p0 = sprite.TransformPoint(x + -halfWidth, y + -halfHeight);
+            var p1 = sprite.TransformPoint(x + halfWidth, y + -halfHeight);
+            var p2 = sprite.TransformPoint(x + -halfWidth, y + halfHeight);
+            destPoints[0] = new PointF(p0.x, p0.y);
+            destPoints[1] = new PointF(p1.x, p1.y);
+            destPoints[2] = new PointF(p2.x, p2.y);
+            graphics.DrawImage(sprite.texture.bitmap, destPoints);
+        }
+
         public void DrawTexture(Texture2D texture, float x, float y) {
             var halfWidth = texture.width / 2.0f;
             var halfHeight = texture.height / 2.0f;
