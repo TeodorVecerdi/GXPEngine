@@ -89,7 +89,7 @@ namespace GXPEngine
 		/// <param name='pixelArt'>
 		/// If <c>true</c>, textures will not be interpolated ('blurred'). This way, you can get a typical pixel art look.
 		/// </param>
-		public Game (int pWidth, int pHeight, bool pFullScreen, bool pVSync = true, int pRealWidth=-1, int pRealHeight=-1, bool pPixelArt=false) : base()
+		public Game (int pWidth, int pHeight, bool pFullScreen, bool pVSync = true, int pRealWidth=-1, int pRealHeight=-1, bool pPixelArt=false, string windowTitle="GXPEngine") : base()
 		{
 			if (pRealWidth <= 0) {
 				pRealWidth = pWidth;
@@ -113,7 +113,7 @@ namespace GXPEngine
 				_updateManager = new UpdateManager ();
 				_collisionManager = new CollisionManager ();
 				_glContext = new GLContext (this);
-				_glContext.CreateWindow (pWidth, pHeight, pFullScreen, pVSync, pRealWidth, pRealHeight);
+				_glContext.CreateWindow (pWidth, pHeight, pFullScreen, pVSync, pRealWidth, pRealHeight,windowTitle);
 
 				_renderRange = new Rectangle (0, 0, pWidth, pHeight);
 

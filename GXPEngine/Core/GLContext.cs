@@ -236,7 +236,7 @@ namespace GXPEngine.Core
                     _frameCount++;
                     if (Time.time - _lastFPSTime > 1000)
                     {
-                        currentFps = (int)(_frameCount / ((Time.time - _lastFPSTime) / 1000.0f));
+                        _lastFPS = (int)(_frameCount / ((Time.time - _lastFPSTime) / 1000.0f));
                         _lastFPSTime = Time.time;
                         _frameCount = 0;
                     }

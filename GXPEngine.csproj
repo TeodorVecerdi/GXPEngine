@@ -35,8 +35,8 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\portable-net40+sl4+win8+wp8\System.ValueTuple.dll</HintPath>
+    <Reference Include="System.ValueTuple, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>packages\System.ValueTuple.4.3.1\lib\portable-net40+sl4+win8+wp8\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
@@ -57,7 +57,11 @@
     <Compile Include="GXPEngine\Core\Rectangle.cs" />
     <Compile Include="GXPEngine\Core\Texture2D.cs" />
     <Compile Include="GXPEngine\Core\Transformable.cs" />
+    <Compile Include="GXPEngine\Core\SoundSystem.cs" />
     <Compile Include="GXPEngine\FMOD\FMOD.cs" />
+    <Compile Include="GXPEngine\FMOD\FMODSoundSystem.cs" />
+    <Compile Include="GXPEngine\SoLoud\Soloud.cs" />
+    <Compile Include="GXPEngine\SoLoud\SoloudSoundSystem.cs" />
     <Compile Include="GXPEngine\Game.cs" />
     <Compile Include="GXPEngine\GameObject.cs" />
     <Compile Include="GXPEngine\Graphics\Canvas.cs" />
