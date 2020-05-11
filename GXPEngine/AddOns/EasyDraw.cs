@@ -83,7 +83,10 @@ namespace GXPEngine {
         public void NoStroke() {
             _stroke = false;
         }
-
+        public void Stroke(Color newColor) {
+            pen.Color = Color.FromArgb(newColor.A, newColor);
+            _stroke = true;
+        }
         public void Stroke(Color newColor, int alpha = 255) {
             pen.Color = Color.FromArgb(alpha, newColor);
             _stroke = true;
@@ -108,6 +111,11 @@ namespace GXPEngine {
 
         public void NoFill() {
             _fill = false;
+        }
+        
+        public void Fill(Color newColor) {
+            brush.Color = Color.FromArgb(newColor.A, newColor);
+            _fill = true;
         }
 
         public void Fill(Color newColor, int alpha = 255) {
