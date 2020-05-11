@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using GXPEngine.OpenGL;
 
-namespace GXPEngine.Core {
-    internal class WindowSize {
+namespace GXPEngine.Core
+{
+    internal class WindowSize
+    {
         public static WindowSize instance = new WindowSize();
         public int width, height;
     }
 
-    public class GLContext {
+    public class GLContext
+    {
         private const int MAXKEYS = 65535;
         private const int MAXBUTTONS = 255;
 
@@ -22,29 +25,31 @@ namespace GXPEngine.Core {
 
         public static int mouseX;
         public static int mouseY;
-        
+
         private static int lastKey;
         private static int lastKeyDown;
         private static int lastKeyUp;
 
         private static double _realToLogicWidthRatio;
         private static double _realToLogicHeightRatio;
-        
 
         private readonly Game _owner;
-        private int _frameCount;
-        private long _lastFPSTime;
-        private long _lastFrameTime;
+        private static SoundSystem _soundSystem;
 
         private int _targetFrameRate = 60;
-        private bool _vsyncEnabled;
+        private long _lastFrameTime = 0;
+        private long _lastFPSTime = 0;
+        private int _frameCount = 0;
+        private int _lastFPS = 0;
+        private bool _vsyncEnabled = false;
 
         //------------------------------------------------------------------------------------------------------------------------
         //														RenderWindow()
         //------------------------------------------------------------------------------------------------------------------------
-        public GLContext(Game owner) {
+        public GLContext(Game owner)
+        {
             _owner = owner;
-            currentFps = _targetFrameRate;
+            _lastFPS = _targetFrameRate;
         }
 
         //------------------------------------------------------------------------------------------------------------------------
@@ -57,11 +62,13 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         public int height => WindowSize.instance.height;
 
-        public int currentFps { get; private set; }
+        public int currentFps => _lastFPS;
 
-        public int targetFps {
+        public int targetFps
+        {
             get => _targetFrameRate;
-            set {
+            set
+            {
                 if (value < 1)
                     _targetFrameRate = 1;
                 else
@@ -70,14 +77,30 @@ namespace GXPEngine.Core {
         }
 
         //------------------------------------------------------------------------------------------------------------------------
+        //														SoundSystem
+        //------------------------------------------------------------------------------------------------------------------------
+        public static SoundSystem soundSystem
+        {
+            get
+            {
+                if (_soundSystem == null)
+                {
+                    InitializeSoundSystem();
+                }
+                return _soundSystem;
+            }
+        }
+
+        //------------------------------------------------------------------------------------------------------------------------
         //														setupWindow()
         //------------------------------------------------------------------------------------------------------------------------
-        public void CreateWindow(int width, int height, bool fullScreen, bool vSync, int realWidth, int realHeight, string title) {
+        public void CreateWindow(int width, int height, bool fullScreen, bool vSync, int realWidth, int realHeight, string title)
+        {
             // This stores the "logical" width, used by all the game logic:
             WindowSize.instance.width = width;
             WindowSize.instance.height = height;
-            _realToLogicWidthRatio = (double) realWidth / width;
-            _realToLogicHeightRatio = (double) realHeight / height;
+            _realToLogicWidthRatio = (double)realWidth / width;
+            _realToLogicHeightRatio = (double)realHeight / height;
             _vsyncEnabled = vSync;
 
             GL.glfwInit();
@@ -88,12 +111,16 @@ namespace GXPEngine.Core {
             GL.glfwSwapInterval(vSync);
 
             GL.glfwSetKeyCallback(
-                (_key, _mode) => {
+                (_key, _mode) =>
+                {
                     var press = _mode == 1;
-                    if (press) {
+                    if (press)
+                    {
                         keydown[_key] = true;
                         lastKeyDown = _key;
-                    } else {
+                    }
+                    else
+                    {
                         keyup[_key] = true;
                         lastKeyUp = _key;
                     }
@@ -102,14 +129,16 @@ namespace GXPEngine.Core {
                 });
 
             GL.glfwSetMouseButtonCallback(
-                (_button, _mode) => {
+                (_button, _mode) =>
+                {
                     var press = _mode == 1;
                     if (press) mousehits[_button] = true;
                     else mouseup[_button] = true;
                     buttons[_button] = press;
                 });
 
-            GL.glfwSetWindowSizeCallback((newWidth, newHeight) => {
+            GL.glfwSetWindowSizeCallback((newWidth, newHeight) =>
+            {
                 GL.Viewport(0, 0, newWidth, newHeight);
                 GL.Enable(GL.MULTISAMPLE);
                 GL.Enable(GL.TEXTURE_2D);
@@ -127,19 +156,32 @@ namespace GXPEngine.Core {
                 // Here's where the conversion from logical width/height to real width/height happens: 
                 GL.Ortho(0.0f, newWidth / _realToLogicWidthRatio, newHeight / _realToLogicHeightRatio, 0.0f, 0.0f, 1000.0f);
 
-                lock (WindowSize.instance) {
-                    WindowSize.instance.width = (int) (newWidth / _realToLogicWidthRatio);
-                    WindowSize.instance.height = (int) (newHeight / _realToLogicHeightRatio);
+                lock (WindowSize.instance)
+                {
+                    WindowSize.instance.width = (int)(newWidth / _realToLogicWidthRatio);
+                    WindowSize.instance.height = (int)(newHeight / _realToLogicHeightRatio);
                 }
 
                 if (Game.main != null) Game.main.RenderRange = new Rectangle(0, 0, WindowSize.instance.width, WindowSize.instance.height);
             });
+            InitializeSoundSystem();
+        }
+
+        private static void InitializeSoundSystem()
+        {
+#if USE_FMOD_AUDIO
+            _soundSystem = new FMODSoundSystem ();
+#else
+            _soundSystem = new SoloudSoundSystem();
+#endif
+            _soundSystem.Init();
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														ShowCursor()
         //------------------------------------------------------------------------------------------------------------------------
-        public void ShowCursor(bool enable) {
+        public void ShowCursor(bool enable)
+        {
             if (enable)
                 GL.glfwEnable(GL.GLFW_MOUSE_CURSOR);
             else
@@ -149,17 +191,18 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         //														SetScissor()
         //------------------------------------------------------------------------------------------------------------------------
-        public void SetScissor(int x, int y, int width, int height) {
+        public void SetScissor(int x, int y, int width, int height)
+        {
             if (width == WindowSize.instance.width && height == WindowSize.instance.height)
                 GL.Disable(GL.SCISSOR_TEST);
             else
                 GL.Enable(GL.SCISSOR_TEST);
 
             GL.Scissor(
-                (int) (x * _realToLogicWidthRatio),
-                (int) (y * _realToLogicHeightRatio),
-                (int) (width * _realToLogicWidthRatio),
-                (int) (height * _realToLogicHeightRatio)
+                (int)(x * _realToLogicWidthRatio),
+                (int)(y * _realToLogicHeightRatio),
+                (int)(width * _realToLogicWidthRatio),
+                (int)(height * _realToLogicHeightRatio)
             );
 
             //GL.Scissor(x, y, width, height);
@@ -168,7 +211,9 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         //														Close()
         //------------------------------------------------------------------------------------------------------------------------
-        public void Close() {
+        public void Close()
+        {
+            _soundSystem.Deinit();
             GL.glfwCloseWindow();
             GL.glfwTerminate();
             Environment.Exit(0);
@@ -177,23 +222,28 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         //														Run()
         //------------------------------------------------------------------------------------------------------------------------
-        public void Run() {
+        public void Run()
+        {
             //Update();
             GL.glfwSetTime(0.0);
-            do {
-                if (_vsyncEnabled || Time.time - _lastFrameTime > 1000 / _targetFrameRate) {
+            do
+            {
+                if (_vsyncEnabled || Time.time - _lastFrameTime > 1000 / _targetFrameRate)
+                {
                     _lastFrameTime = Time.time;
 
                     //actual fps count tracker
                     _frameCount++;
-                    if (Time.time - _lastFPSTime > 1000) {
-                        currentFps = (int) (_frameCount / ((Time.time - _lastFPSTime) / 1000.0f));
+                    if (Time.time - _lastFPSTime > 1000)
+                    {
+                        currentFps = (int)(_frameCount / ((Time.time - _lastFPSTime) / 1000.0f));
                         _lastFPSTime = Time.time;
                         _frameCount = 0;
                     }
 
                     UpdateMouseInput();
                     _owner.Step();
+                    _soundSystem.Step();
 
                     ResetHitCounters();
                     Display();
@@ -207,7 +257,8 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         //														display()
         //------------------------------------------------------------------------------------------------------------------------
-        private void Display() {
+        private void Display()
+        {
             GL.Clear(GL.COLOR_BUFFER_BIT);
 
             GL.MatrixMode(GL.MODELVIEW);
@@ -222,14 +273,16 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         //														SetColor()
         //------------------------------------------------------------------------------------------------------------------------
-        public void SetColor(byte r, byte g, byte b, byte a) {
+        public void SetColor(byte r, byte g, byte b, byte a)
+        {
             GL.Color4ub(r, g, b, a);
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														PushMatrix()
         //------------------------------------------------------------------------------------------------------------------------
-        public void PushMatrix(float[] matrix) {
+        public void PushMatrix(float[] matrix)
+        {
             GL.PushMatrix();
             GL.MultMatrixf(matrix);
         }
@@ -237,14 +290,16 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         //														PopMatrix()
         //------------------------------------------------------------------------------------------------------------------------
-        public void PopMatrix() {
+        public void PopMatrix()
+        {
             GL.PopMatrix();
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														DrawQuad()
         //------------------------------------------------------------------------------------------------------------------------
-        public void DrawQuad(float[] vertices, float[] uv) {
+        public void DrawQuad(float[] vertices, float[] uv)
+        {
             GL.EnableClientState(GL.TEXTURE_COORD_ARRAY);
             GL.EnableClientState(GL.VERTEX_ARRAY);
             GL.TexCoordPointer(2, GL.FLOAT, 0, uv);
@@ -257,7 +312,8 @@ namespace GXPEngine.Core {
         /// <summary>
         ///     Draws triangles using 2D coordinates for vertices
         /// </summary>
-        public void DrawTriangles2D(float[] vertices, int[] indices, float[] uvs) {
+        public void DrawTriangles2D(float[] vertices, int[] indices, float[] uvs)
+        {
             GL.EnableClientState(GL.TEXTURE_COORD_ARRAY);
             GL.EnableClientState(GL.VERTEX_ARRAY);
             GL.TexCoordPointer(2, GL.FLOAT, 0, uvs);
@@ -270,7 +326,8 @@ namespace GXPEngine.Core {
         /// <summary>
         ///     Draws triangles using 3D coordinates for vertices
         /// </summary>
-        public void DrawTriangles(float[] vertices, int[] indices, float[] uvs) {
+        public void DrawTriangles(float[] vertices, int[] indices, float[] uvs)
+        {
             GL.EnableClientState(GL.TEXTURE_COORD_ARRAY);
             GL.EnableClientState(GL.VERTEX_ARRAY);
             GL.TexCoordPointer(2, GL.FLOAT, 0, uvs);
@@ -280,16 +337,19 @@ namespace GXPEngine.Core {
             GL.DisableClientState(GL.TEXTURE_COORD_ARRAY);
         }
 
-        public void DrawMesh(Mesh mesh) {
+        public void DrawMesh(Mesh mesh)
+        {
             var vertices = new List<float>();
             var uvs = new List<float>();
-            foreach (var vertex in mesh.Vertices) {
+            foreach (var vertex in mesh.Vertices)
+            {
                 vertices.Add(vertex.x);
                 vertices.Add(vertex.y);
                 vertices.Add(vertex.z);
             }
 
-            foreach (var uv in mesh.Uvs) {
+            foreach (var uv in mesh.Uvs)
+            {
                 uvs.Add(uv.x);
                 uvs.Add(uv.y);
             }
@@ -302,29 +362,33 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         //														GetKey()
         //------------------------------------------------------------------------------------------------------------------------
-        public static bool GetKey(int key) {
+        public static bool GetKey(int key)
+        {
             return keys[key];
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														GetKeyDown()
         //------------------------------------------------------------------------------------------------------------------------
-        public static bool GetKeyDown(int key) {
+        public static bool GetKeyDown(int key)
+        {
             return keydown[key];
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														GetKeyUp()
         //------------------------------------------------------------------------------------------------------------------------
-        public static bool GetKeyUp(int key) {
+        public static bool GetKeyUp(int key)
+        {
             return keyup[key];
         }
-        
+
         //------------------------------------------------------------------------------------------------------------------------
         //														AnyKey()
         //------------------------------------------------------------------------------------------------------------------------
-        public static bool AnyKey() {
-            for(var i = 0; i < MAXKEYS; i++)
+        public static bool AnyKey()
+        {
+            for (var i = 0; i < MAXKEYS; i++)
                 if (keys[i])
                     return true;
             return false;
@@ -333,8 +397,9 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         //														AnyKeyDown()
         //------------------------------------------------------------------------------------------------------------------------
-        public static bool AnyKeyDown() {
-            for(var i = 0; i < MAXKEYS; i++)
+        public static bool AnyKeyDown()
+        {
+            for (var i = 0; i < MAXKEYS; i++)
                 if (keydown[i])
                     return true;
             return false;
@@ -343,59 +408,67 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         //														AnyKeyUp()
         //------------------------------------------------------------------------------------------------------------------------
-        public static bool AnyKeyUp() {
-            for(var i = 0; i < MAXKEYS; i++)
+        public static bool AnyKeyUp()
+        {
+            for (var i = 0; i < MAXKEYS; i++)
                 if (keyup[i])
                     return true;
             return false;
         }
-        
+
         //------------------------------------------------------------------------------------------------------------------------
         //														LastKey()
         //------------------------------------------------------------------------------------------------------------------------
-        public static int LastKey() {
+        public static int LastKey()
+        {
             return lastKey;
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														LastKeyDown()
         //------------------------------------------------------------------------------------------------------------------------
-        public static int LastKeyDown() {
+        public static int LastKeyDown()
+        {
             return lastKeyDown;
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														LastKeyUp()
         //------------------------------------------------------------------------------------------------------------------------
-        public static int LastKeyUp() {
+        public static int LastKeyUp()
+        {
             return lastKeyUp;
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														GetMouseButton()
         //------------------------------------------------------------------------------------------------------------------------
-        public static bool GetMouseButton(int button) {
+        public static bool GetMouseButton(int button)
+        {
             return buttons[button];
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														GetMouseButtonDown()
         //------------------------------------------------------------------------------------------------------------------------
-        public static bool GetMouseButtonDown(int button) {
+        public static bool GetMouseButtonDown(int button)
+        {
             return mousehits[button];
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														GetMouseButtonUp()
         //------------------------------------------------------------------------------------------------------------------------
-        public static bool GetMouseButtonUp(int button) {
+        public static bool GetMouseButtonUp(int button)
+        {
             return mouseup[button];
         }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														ResetHitCounters()
         //------------------------------------------------------------------------------------------------------------------------
-        public static void ResetHitCounters() {
+        public static void ResetHitCounters()
+        {
             Array.Clear(keydown, 0, MAXKEYS);
             Array.Clear(keyup, 0, MAXKEYS);
             Array.Clear(mousehits, 0, MAXBUTTONS);
@@ -405,10 +478,11 @@ namespace GXPEngine.Core {
         //------------------------------------------------------------------------------------------------------------------------
         //														UpdateMouseInput()
         //------------------------------------------------------------------------------------------------------------------------
-        public static void UpdateMouseInput() {
+        public static void UpdateMouseInput()
+        {
             GL.glfwGetMousePos(out mouseX, out mouseY);
-            mouseX = (int) (mouseX / _realToLogicWidthRatio);
-            mouseY = (int) (mouseY / _realToLogicHeightRatio);
+            mouseX = (int)(mouseX / _realToLogicWidthRatio);
+            mouseY = (int)(mouseY / _realToLogicHeightRatio);
         }
     }
 }
